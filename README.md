@@ -226,11 +226,8 @@ Project conventions and workflow, so an AI can pick up edits with no prior conte
 
 ### 🌿 Working branch
 
-- **`main`** → production (`your-domain.com`); every push redeploys in ~1 min.
-- **`dev`** (or any feature branch) → preview at `<branch>.<your-project>.pages.dev` (Cloudflare generates a URL per branch).
-- Flow: edit on `dev` → PR to `main` → **merge commit (no squash)** → redeploy.
-
-> **Squash-merge:** squashing a diverged branch can produce a diff that doesn't apply changes already present in both branches. Always use a merge commit for dev→main.
+- **`main`** → production (`your-domain.com`); every push redeploys in ~1 min. Editing and pushing straight to `main` is the normal flow for a solo portfolio.
+- **Optional — preview before going live:** push to any branch and Cloudflare serves a per-branch preview at `<branch>.<your-project>.pages.dev`. Handy for risky changes — you see them before they hit your public site; merge to `main` when you're happy.
 
 ### 🌈 Colors
 
@@ -316,14 +313,13 @@ node test/checks.mjs   # exit ≠ 0 if something fails
 
 It runs on its own at session start via the hook (`.claude/hooks/session-start.sh`). When adding a check, add it to `test/checks.mjs`.
 
-### ☑️ Checklist before merging to main
+### ☑️ Checklist before pushing to main
 
 1. `node test/checks.mjs` passes.
-2. Branch preview OK.
-3. Dark **and** light mode.
-4. Mobile (especially iOS Safari).
-5. If the CV changed, regenerate the PDFs.
-6. Merge commit (no squash).
+2. Dark **and** light mode.
+3. Mobile (especially iOS Safari).
+4. If the CV changed, regenerate the PDFs.
+5. For risky changes, check the branch preview first.
 
 ---
 
@@ -553,11 +549,8 @@ Convenciones y flujo del proyecto, para que una IA retome ediciones sin contexto
 
 ### 🌿 Rama de trabajo
 
-- **`main`** → producción (`tu-dominio.com`); cada push redeploya en ~1 min.
-- **`dev`** (o cualquier feature branch) → preview en `<rama>.<tu-proyecto>.pages.dev` (Cloudflare genera una URL por rama).
-- Flujo: editar en `dev` → PR a `main` → **merge commit (no squash)** → redeploy.
-
-> **Squash-merge:** si se hace squash de una rama divergida, el diff puede no aplicar cambios ya presentes en ambas ramas. Usar siempre merge commit para dev→main.
+- **`main`** → producción (`tu-dominio.com`); cada push redeploya en ~1 min. Editar y pushear directo a `main` es el flujo normal para un portfolio de una persona.
+- **Opcional — preview antes de publicar:** pusheá a cualquier rama y Cloudflare sirve un preview por rama en `<rama>.<tu-proyecto>.pages.dev`. Útil para cambios riesgosos — los ves antes de que salgan en tu sitio público; mergeás a `main` cuando estás conforme.
 
 ### 🌈 Colores
 
@@ -643,14 +636,13 @@ node test/checks.mjs   # exit ≠ 0 si algo falla
 
 Corre sola al iniciar sesión vía hook (`.claude/hooks/session-start.sh`). Al agregar un check, sumalo a `test/checks.mjs`.
 
-### ☑️ Checklist antes de mergear a main
+### ☑️ Checklist antes de pushear a main
 
 1. `node test/checks.mjs` pasa.
-2. Preview de la rama OK.
-3. Modo oscuro **y** claro.
-4. Mobile (sobre todo iOS Safari).
-5. Si cambió el CV, regenerar los PDFs.
-6. Merge commit (no squash).
+2. Modo oscuro **y** claro.
+3. Mobile (sobre todo iOS Safari).
+4. Si cambió el CV, regenerar los PDFs.
+5. Para cambios riesgosos, revisá antes el preview de la rama.
 
 ---
 
