@@ -1,14 +1,252 @@
-# portfolio-kit
+# Portfolio Kit
 
-Template de **link-in-bio + CV interactivo** — **HTML estático, sin build, sin backend**, servido desde el edge de **Cloudflare Pages**. Hacelo tuyo editando, sobre todo, un único archivo de configuración (`config.js`).
+🌐 **Language / Idioma:** [English](#english) · [Español](#español)
 
-🔗 **Demo en vivo / Live demo:** https://portfolio.biggio.com.ar
+🔗 **Live demo / Demo en vivo:** https://portfolio.biggio.com.ar
 
-🌐 **Idioma / Language:** [Español](#español) · [English](#english)
+---
+
+# English
+
+Link-in-bio + interactive CV template — **static HTML, no build, no backend**, served from the **Cloudflare Pages** edge. Make it yours by editing, above all, a single config file (`config.js`).
+
+## 🚀 Get your portfolio in 5 steps
+
+1. **Copy this repo to your GitHub.** Click **Use this template** (or fork) on this repository to create your own copy under your account.
+2. **Deploy it on Cloudflare Pages.** Create a Cloudflare Pages project and connect the repo you just created (Framework preset `None`, empty build command, output `/`). In ~1 min your site is live at `your-project.pages.dev` with this template already running. *(Optional: add your own domain — see [Deployment](#7--deployment).)*
+3. **Connect the repo to Claude Code.** Point a [Claude Code](https://claude.com/claude-code) session — or any AI that can edit your GitHub repo directly — at your new repository.
+4. **Gather your info.** The easy way: from your LinkedIn profile, **Save to PDF** (`More → Save to PDF`) and download that plain PDF.
+5. **Let the AI adapt the template.** Attach that PDF and give Claude Code this prompt:
+
+   > Adapt this link-in-bio + interactive CV template to me using the attached LinkedIn PDF. Update `config.js` with my identity (name, initials, role, anchor, email, links). Rewrite the `DATA` object in `CV-interactivo.html` with my real summary, experience, skills, education, languages and certifications — in both Spanish and English. Update the mini-chat greeting and Q&A. Keep the structure, design and tests intact. When you're done, run `node test/checks.mjs` and push.
+
+   Then replace the photo (`img/photo.jpg`) and the CV PDFs as described in [Make it your own](#5--make-it-your-own).
+
+**Contents**
+
+1. [🧱 Architecture](#1--architecture)
+2. [🎨 Design](#2--design)
+3. [📁 Repository structure](#3--repository-structure)
+4. [✨ Features](#4--features)
+5. [🧬 Make it your own](#5--make-it-your-own)
+6. [🔧 Configuration (config.js)](#6--configuration-configjs)
+7. [🚀 Deployment](#7--deployment)
+8. [📊 Analytics (optional)](#8--analytics-optional)
+9. [🔎 SEO and indexing](#9--seo-and-indexing)
+10. [📌 Notes](#10--notes)
+11. [🤖 AI editing guide](#11--ai-editing-guide)
+12. [📄 License](#12--license)
+
+## 1. 🧱 Architecture
+
+**100% static**: no application server, database, or build. Just `.html` / `.pdf` files Cloudflare serves from its global CDN (edge), with minimal latency and nothing to keep "running".
+
+```
+   You edit                  GitHub                    Cloudflare Pages              Visitor
+  ┌──────────┐   git push   ┌──────────┐  webhook    ┌────────────────────┐  HTTPS  ┌──────────┐
+  │   code   │ ───────────► │   main   │ ──────────► │  build (none) +     │ ──────► │ browser  │
+  │  (local) │              │  (repo)  │             │  deploy to edge/CDN │         │          │
+  └──────────┘              └──────────┘             └────────────────────┘         └──────────┘
+                                                          your-domain.com
+```
+
+**Deploy flow:** `git push` to `main` → a Cloudflare Pages webhook triggers the deploy (native CI/CD, **no GitHub Actions**) → since there's no build (`Build command` empty, output `/`), it publishes the files as-is → live in **~1 min**. Every commit to `main` = one deploy.
+
+**Architecture decisions:**
+
+- **No backend → no attack surface or server costs.** No secrets in the repo. The only server-side logic is a minimal middleware (`functions/_middleware.js`) hiding documentation files.
+- **Edge/CDN** → fast and resilient by default.
+- **The repo is the single source of truth:** what's on `main` is what the visitor sees.
+- **All logic lives in the client** (language, theme, QR, vCard) with vanilla JS, no frameworks.
+
+**Components:**
+
+| Piece | Role |
+|---|---|
+| `config.js` | **Centralized identity** (name, initials, role, anchor, email, links, `siteUrl`, vCard, greeting). Read by landing and CV and applied to the DOM. Editing it = changing the whole site. |
+| `index.html` | Landing (link-in-bio): photo, name, role, anchor, mini-chat, buttons, QR, vCard. Language/theme logic in an inline `<script>`. |
+| `CV-interactivo.html` | CV rendered by JS from an embedded `DATA` object (ES/EN). Reads `?lang=` from the URL. |
+| `img/photo.jpg` | Photo shared by landing and CV. External (not base64) → light, cacheable HTML. |
+| `img/og-photo.jpg` | 1200×630 image for the share preview (Open Graph). |
+| `icons/` | Favicon and icons (`favicon.svg/.ico`, `favicon-16/32.png`, `apple-touch-icon.png`). |
+| `lib/qrcode.min.js` | QR library (qrcodejs 1.0.0), local, no CDN. |
+| `cv/cv-es.pdf` / `cv/cv-en.pdf` | Downloadable CV; the landing serves one or the other by language. |
+| `tools/gen_icons.py`, `tools/gen_og.py` | Generators (Python/Pillow) for `icons/` and `img/og-photo.jpg`. Dev only — blocked from the public site. |
+| `_headers` | Security headers applied by Cloudflare (see below). |
+| `robots.txt` | Crawling: `Allow: /`, `Disallow: /cv/`, and the pointer to `sitemap.xml`. |
+| `sitemap.xml` | Site map (landing + CV). |
+| `functions/_middleware.js` | Edge middleware: returns `404` for non-public files (`README.md`, `.gitignore`, `/test/`, `/.claude/`, `/tools/`). |
+| `test/checks.mjs` | Dependency-free smoke tests (Node). Run on session start via the `.claude/` hook. |
+
+**Security (via `_headers`):** `X-Frame-Options: SAMEORIGIN` (anti-clickjacking) · `X-Content-Type-Options: nosniff` · `Referrer-Policy: no-referrer` · `Permissions-Policy` (blocks camera/microphone/geolocation).
+
+> The site is **public and indexable** (see [🔎 SEO and indexing](#9--seo-and-indexing)). Being indexable doesn't change the security posture: the content was always public; now it also shows up in search engines.
+
+---
+
+## 2. 🎨 Design
+
+Custom design, no CSS framework — the entire visual system is inline in each HTML file.
+
+- **Typography:** [DM Sans](https://fonts.google.com/specimen/DM+Sans) (text) + [DM Mono](https://fonts.google.com/specimen/DM+Mono) (data/dates), from Google Fonts.
+- **Accent color:** blue `#2e44c9`, centralized in CSS variables (`--blue`, `--name`, `--accent`…) → one change repaints everything.
+- **Light/dark theme:** toggled with `data-theme` on `<html>`; each theme redefines the variables. The ☀️/🌙 button applies instantly.
+
+**`index.html`:** centered card with photo, name, role, and buttons (LinkedIn · CV · References) with inline SVG icons; **floating chip** of photo+name on scroll; **attribute-based i18n** `data-es`/`data-en`; **QR + vCard** generated on the client.
+
+**`CV-interactivo.html`:** "A4 sheet" layout with **CSS grid** (dark header, sidebar, experience column); **data-driven render** from the `DATA` object (ES/EN) → one source, two languages; opens in the landing's language via `?lang=`; **responsive** (collapses to one column at `max-width:680px`).
+
+---
+
+## 3. 📁 Repository structure
+
+Files **grouped by type** (`img/`, `icons/`, `cv/`, `lib/`). Only what **must** be at the root stays there: the pages, `config.js`, and what Cloudflare reads from the root (`_headers`, `robots.txt`, `sitemap.xml`, `functions/`).
+
+```
+.
+├── index.html              # Landing (link-in-bio)
+├── CV-interactivo.html     # Interactive CV (JS render, ES/EN)
+├── config.js               # ★ Centralized identity — read by landing + CV
+├── img/                    # photo.jpg (shared) · og-photo.jpg (preview 1200×630)
+├── icons/                  # favicon.svg/.ico · favicon-16/32.png · apple-touch-icon.png
+├── cv/                     # cv-es.pdf · cv-en.pdf (downloadable CV)
+├── lib/                    # qrcode.min.js (local, no CDN)
+├── robots.txt              # Crawl rules + sitemap (SEO)
+├── sitemap.xml             # Site map (landing + CV)
+├── _headers                # Security headers
+├── functions/_middleware.js # Hides docs/tooling from the public site
+├── tools/                  # gen_icons.py · gen_og.py (generators, dev only)
+├── test/checks.mjs         # Smoke tests (Node, no dependencies)
+├── .claude/                # settings.json + hooks/session-start.sh
+├── LICENSE                 # MIT license
+├── .gitignore
+└── README.md
+```
+
+---
+
+## 4. ✨ Features
+
+- ES / EN language switch (landing and CV, with continuity via `?lang=`)
+- Light / dark theme (☀️ / 🌙)
+- Buttons: LinkedIn · interactive CV · References
+- CV download in PDF by language
+- QR + vCard generated on the client
+- Floating name/photo chip on scroll
+- Open Graph / canonical meta tags for previews
+- **SEO:** indexable, with `sitemap.xml` and `/cv/` excluded from results
+
+---
+
+## 5. 🧬 Make it your own
+
+The personal content is **centralized** so you edit just a few places:
+
+1. **`config.js`** — your identity: name, initials, role (ES/EN), anchor, email, links, `siteUrl`, vCard title, and greeting. Editing it updates landing and CV.
+2. **`DATA` object in `CV-interactivo.html`** — the CV content (summary, experience, skills, education, languages, certifications) in Spanish and English.
+3. **Photo** `img/photo.jpg` (square, ~800×800) — used by landing and CV. The bundled one is just a sample placeholder: replace it with yours.
+
+The 4 things that **cannot** read `config.js` (static, read by crawlers/browser) and are edited by hand:
+
+4. **`<head>`** of each HTML: `<title>`, `<link rel="canonical">`, and `og:*` / `twitter:*` metas. Grouped and commented.
+5. **Favicon:** `python3 tools/gen_icons.py` — uses `initials` from `config.js` and the color from `index.html` to regenerate `icons/`.
+6. **Share image** `img/og-photo.jpg`: `python3 tools/gen_og.py` — centers `img/photo.jpg` over a background sampled from the edge. The **PDFs** `cv/*.pdf` are replaced by hand.
+7. **Domain:** configure `your-domain.com` in Cloudflare Pages and update `siteUrl` in `config.js` + the static absolute URLs (`canonical`, `og:url`/`og:image`, `sitemap.xml`, and the `Sitemap:` line in `robots.txt`).
+
+> The `tools/` scripts need Python with Pillow (`pip install pillow`). When done: `node test/checks.mjs` and `git push`.
+
+---
+
+## 6. 🔧 Configuration (config.js)
+
+| Field | What for |
+|---|---|
+| `firstName` / `lastName` / `initials` | Displayed name + favicon/title initials |
+| `roleES` / `roleEN` | Landing subtitle (bilingual) |
+| `anchorES` / `anchorEN` | Quantitative chip under the name (empty = hidden) |
+| `email` / `linkedin` / `featured` | Contact and button links |
+| `siteUrl` | QR + sharing |
+| `vcardTitle` | Job title saved into the vCard |
+| `chatGreetES` / `chatGreetEN` | Mini-chat greeting |
+| `fileBase` | PDF file name on download (`<fileBase>-ES.pdf`) |
+
+---
+
+## 7. 🚀 Deployment
+
+Cloudflare Pages + GitHub, native CI/CD: every `git push` to `main` redeploys on its own.
+
+**1. Push the repo (once):**
+
+```bash
+git init && git add . && git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/YOUR-USER/portfolio.git
+git push -u origin main
+```
+
+**2. Connect Cloudflare Pages:** Dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** → pick the repo. Build config: **Framework preset** `None`, **Build command** *(empty)*, **Output** `/` → **Save and Deploy**.
+
+**3. Custom domain:** Pages → your project → **Custom domains** → add `your-domain.com`. Cloudflare sets up DNS + HTTPS automatically.
+
+**Workflow:** edit → `git add . && git commit -m "update: ..." && git push` → redeploy in ~1 min.
+
+---
+
+## 8. 📊 Analytics (optional)
+
+- **Visits:** Cloudflare Dashboard → your project → **Web Analytics** → enable. Zero code, no cookies.
+- **Per-button click tracking:** already wired in `index.html` (`data-track` elements); logs to console by default. To send it to a service, follow the commented instructions in the `<script>`.
+
+---
+
+## 9. 🔎 SEO and indexing
+
+The site is **public and indexable** — meant to be promoted and show up in search engines.
+
+- **`robots.txt`**: `Allow: /` + sitemap pointer. The only block is `Disallow: /cv/`: the PDFs shouldn't appear as standalone results in Google; the entry point is the page.
+- **`sitemap.xml`** (root): lists the two indexable pages —landing (`/`) and CV (`/CV-interactivo.html`)— with `<lastmod>`. Add new pages here.
+- **Canonical:** each HTML declares its canonical URL with `<link rel="canonical">`, to avoid duplicate content.
+- **`_headers`** only carries security headers (no `X-Robots-Tag`).
+
+> The template ships **indexable** by default. To keep it out of search engines (e.g. while you build it), set `Disallow: /` in `robots.txt` and/or add `<meta name="robots" content="noindex">` to each HTML `<head>`.
+
+---
+
+## 10. 📌 Notes
+
+- The site is **public and indexable** (see [🔎 SEO and indexing](#9--seo-and-indexing)). This doesn't make it more or less private: the content was always accessible with the link. For real privacy: Cloudflare Access (free up to 50 users).
+- 100% static: no backend, database, or secrets. Don't commit credentials to the repo.
+
+---
+
+## 11. 🤖 AI editing guide
+
+Internal tooling documentation, kept in **Spanish only**. See [🤖 Guía para una IA](#11--guía-para-una-ia).
+
+---
+
+## 12. 📄 License
+
+Under the **MIT** license — see the [LICENSE](LICENSE) file.
 
 ---
 
 # Español
+
+Template de **link-in-bio + CV interactivo** — **HTML estático, sin build, sin backend**, servido desde el edge de **Cloudflare Pages**. Hacelo tuyo editando, sobre todo, un único archivo de configuración (`config.js`).
+
+## 🚀 Conseguí tu portfolio en 5 pasos
+
+1. **Copiá este repo a tu GitHub.** Hacé clic en **Use this template** (o forkealo) en este repositorio para crear tu propia copia en tu cuenta.
+2. **Deployalo en Cloudflare Pages.** Creá un proyecto de Cloudflare Pages y asociá el repo que acabás de crear (Framework preset `None`, build command vacío, output `/`). En ~1 min tu sitio está en vivo en `tu-proyecto.pages.dev` con este template ya funcionando. *(Opcional: agregá tu dominio propio — ver [Deploy](#7--deploy).)*
+3. **Conectá el repo a Claude Code.** Apuntá una sesión de [Claude Code](https://claude.com/claude-code) — o cualquier IA que pueda editar tu repo de GitHub directamente — a tu nuevo repositorio.
+4. **Conseguí tu información.** La forma fácil: en tu perfil de LinkedIn, **Guardar como PDF** (`Más → Guardar como PDF`) y descargá ese PDF plano.
+5. **Dejá que la IA adapte el template.** Adjuntá ese PDF y pasale a Claude Code este prompt:
+
+   > Adaptá esta plantilla de link-in-bio + CV interactivo a mí usando el PDF de LinkedIn adjunto. Actualizá `config.js` con mi identidad (nombre, iniciales, rol, ancla, mail, links). Reescribí el objeto `DATA` en `CV-interactivo.html` con mi resumen, experiencia, skills, educación, idiomas y certificaciones reales — en español e inglés. Actualizá el saludo y las preguntas del mini-chat. Mantené intactos la estructura, el diseño y los tests. Cuando termines, corré `node test/checks.mjs` y hacé push.
+
+   Después reemplazá la foto (`img/photo.jpg`) y los PDFs del CV como se explica en [Hacé tu propia versión](#5--hacé-tu-propia-versión).
 
 **Contenidos**
 
@@ -318,215 +556,3 @@ Corre sola al iniciar sesión vía hook (`.claude/hooks/session-start.sh`). Al a
 ## 12. 📄 Licencia
 
 Bajo licencia **MIT** — ver el archivo [LICENSE](LICENSE).
-
----
-
-# English
-
-**Contents**
-
-1. [🧱 Architecture](#1--architecture)
-2. [🎨 Design](#2--design)
-3. [📁 Repository structure](#3--repository-structure)
-4. [✨ Features](#4--features)
-5. [🧬 Make it your own](#5--make-it-your-own)
-6. [🔧 Configuration (config.js)](#6--configuration-configjs)
-7. [🚀 Deployment](#7--deployment)
-8. [📊 Analytics (optional)](#8--analytics-optional)
-9. [🔎 SEO and indexing](#9--seo-and-indexing)
-10. [📌 Notes](#10--notes)
-11. [🤖 AI editing guide](#11--ai-editing-guide)
-12. [📄 License](#12--license)
-
-## 1. 🧱 Architecture
-
-**100% static**: no application server, database, or build. Just `.html` / `.pdf` files Cloudflare serves from its global CDN (edge), with minimal latency and nothing to keep "running".
-
-```
-   You edit                  GitHub                    Cloudflare Pages              Visitor
-  ┌──────────┐   git push   ┌──────────┐  webhook    ┌────────────────────┐  HTTPS  ┌──────────┐
-  │   code   │ ───────────► │   main   │ ──────────► │  build (none) +     │ ──────► │ browser  │
-  │  (local) │              │  (repo)  │             │  deploy to edge/CDN │         │          │
-  └──────────┘              └──────────┘             └────────────────────┘         └──────────┘
-                                                          your-domain.com
-```
-
-**Deploy flow:** `git push` to `main` → a Cloudflare Pages webhook triggers the deploy (native CI/CD, **no GitHub Actions**) → since there's no build (`Build command` empty, output `/`), it publishes the files as-is → live in **~1 min**. Every commit to `main` = one deploy.
-
-**Architecture decisions:**
-
-- **No backend → no attack surface or server costs.** No secrets in the repo. The only server-side logic is a minimal middleware (`functions/_middleware.js`) hiding documentation files.
-- **Edge/CDN** → fast and resilient by default.
-- **The repo is the single source of truth:** what's on `main` is what the visitor sees.
-- **All logic lives in the client** (language, theme, QR, vCard) with vanilla JS, no frameworks.
-
-**Components:**
-
-| Piece | Role |
-|---|---|
-| `config.js` | **Centralized identity** (name, initials, role, anchor, email, links, `siteUrl`, vCard, greeting). Read by landing and CV and applied to the DOM. Editing it = changing the whole site. |
-| `index.html` | Landing (link-in-bio): photo, name, role, anchor, mini-chat, buttons, QR, vCard. Language/theme logic in an inline `<script>`. |
-| `CV-interactivo.html` | CV rendered by JS from an embedded `DATA` object (ES/EN). Reads `?lang=` from the URL. |
-| `img/photo.jpg` | Photo shared by landing and CV. External (not base64) → light, cacheable HTML. |
-| `img/og-photo.jpg` | 1200×630 image for the share preview (Open Graph). |
-| `icons/` | Favicon and icons (`favicon.svg/.ico`, `favicon-16/32.png`, `apple-touch-icon.png`). |
-| `lib/qrcode.min.js` | QR library (qrcodejs 1.0.0), local, no CDN. |
-| `cv/cv-es.pdf` / `cv/cv-en.pdf` | Downloadable CV; the landing serves one or the other by language. |
-| `tools/gen_icons.py`, `tools/gen_og.py` | Generators (Python/Pillow) for `icons/` and `img/og-photo.jpg`. Dev only — blocked from the public site. |
-| `_headers` | Security headers applied by Cloudflare (see below). |
-| `robots.txt` | Crawling: `Allow: /`, `Disallow: /cv/`, and the pointer to `sitemap.xml`. |
-| `sitemap.xml` | Site map (landing + CV). |
-| `functions/_middleware.js` | Edge middleware: returns `404` for non-public files (`README.md`, `.gitignore`, `/test/`, `/.claude/`, `/tools/`). |
-| `test/checks.mjs` | Dependency-free smoke tests (Node). Run on session start via the `.claude/` hook. |
-
-**Security (via `_headers`):** `X-Frame-Options: SAMEORIGIN` (anti-clickjacking) · `X-Content-Type-Options: nosniff` · `Referrer-Policy: no-referrer` · `Permissions-Policy` (blocks camera/microphone/geolocation).
-
-> The site is **public and indexable** (see [🔎 SEO and indexing](#9--seo-and-indexing)). Being indexable doesn't change the security posture: the content was always public; now it also shows up in search engines.
-
----
-
-## 2. 🎨 Design
-
-Custom design, no CSS framework — the entire visual system is inline in each HTML file.
-
-- **Typography:** [DM Sans](https://fonts.google.com/specimen/DM+Sans) (text) + [DM Mono](https://fonts.google.com/specimen/DM+Mono) (data/dates), from Google Fonts.
-- **Accent color:** blue `#2e44c9`, centralized in CSS variables (`--blue`, `--name`, `--accent`…) → one change repaints everything.
-- **Light/dark theme:** toggled with `data-theme` on `<html>`; each theme redefines the variables. The ☀️/🌙 button applies instantly.
-
-**`index.html`:** centered card with photo, name, role, and buttons (LinkedIn · CV · References) with inline SVG icons; **floating chip** of photo+name on scroll; **attribute-based i18n** `data-es`/`data-en`; **QR + vCard** generated on the client.
-
-**`CV-interactivo.html`:** "A4 sheet" layout with **CSS grid** (dark header, sidebar, experience column); **data-driven render** from the `DATA` object (ES/EN) → one source, two languages; opens in the landing's language via `?lang=`; **responsive** (collapses to one column at `max-width:680px`).
-
----
-
-## 3. 📁 Repository structure
-
-Files **grouped by type** (`img/`, `icons/`, `cv/`, `lib/`). Only what **must** be at the root stays there: the pages, `config.js`, and what Cloudflare reads from the root (`_headers`, `robots.txt`, `sitemap.xml`, `functions/`).
-
-```
-.
-├── index.html              # Landing (link-in-bio)
-├── CV-interactivo.html     # Interactive CV (JS render, ES/EN)
-├── config.js               # ★ Centralized identity — read by landing + CV
-├── img/                    # photo.jpg (shared) · og-photo.jpg (preview 1200×630)
-├── icons/                  # favicon.svg/.ico · favicon-16/32.png · apple-touch-icon.png
-├── cv/                     # cv-es.pdf · cv-en.pdf (downloadable CV)
-├── lib/                    # qrcode.min.js (local, no CDN)
-├── robots.txt              # Crawl rules + sitemap (SEO)
-├── sitemap.xml             # Site map (landing + CV)
-├── _headers                # Security headers
-├── functions/_middleware.js # Hides docs/tooling from the public site
-├── tools/                  # gen_icons.py · gen_og.py (generators, dev only)
-├── test/checks.mjs         # Smoke tests (Node, no dependencies)
-├── .claude/                # settings.json + hooks/session-start.sh
-├── LICENSE                 # MIT license
-├── .gitignore
-└── README.md
-```
-
----
-
-## 4. ✨ Features
-
-- ES / EN language switch (landing and CV, with continuity via `?lang=`)
-- Light / dark theme (☀️ / 🌙)
-- Buttons: LinkedIn · interactive CV · References
-- CV download in PDF by language
-- QR + vCard generated on the client
-- Floating name/photo chip on scroll
-- Open Graph / canonical meta tags for previews
-- **SEO:** indexable, with `sitemap.xml` and `/cv/` excluded from results
-
----
-
-## 5. 🧬 Make it your own
-
-The personal content is **centralized** so you edit just a few places:
-
-1. **`config.js`** — your identity: name, initials, role (ES/EN), anchor, email, links, `siteUrl`, vCard title, and greeting. Editing it updates landing and CV.
-2. **`DATA` object in `CV-interactivo.html`** — the CV content (summary, experience, skills, education, languages, certifications) in Spanish and English.
-3. **Photo** `img/photo.jpg` (square, ~800×800) — used by landing and CV. The bundled one is just a sample placeholder: replace it with yours.
-
-The 4 things that **cannot** read `config.js` (static, read by crawlers/browser) and are edited by hand:
-
-4. **`<head>`** of each HTML: `<title>`, `<link rel="canonical">`, and `og:*` / `twitter:*` metas. Grouped and commented.
-5. **Favicon:** `python3 tools/gen_icons.py` — uses `initials` from `config.js` and the color from `index.html` to regenerate `icons/`.
-6. **Share image** `img/og-photo.jpg`: `python3 tools/gen_og.py` — centers `img/photo.jpg` over a background sampled from the edge. The **PDFs** `cv/*.pdf` are replaced by hand.
-7. **Domain:** configure `your-domain.com` in Cloudflare Pages and update `siteUrl` in `config.js` + the static absolute URLs (`canonical`, `og:url`/`og:image`, `sitemap.xml`, and the `Sitemap:` line in `robots.txt`).
-
-> The `tools/` scripts need Python with Pillow (`pip install pillow`). When done: `node test/checks.mjs` and `git push`.
-
----
-
-## 6. 🔧 Configuration (config.js)
-
-| Field | What for |
-|---|---|
-| `firstName` / `lastName` / `initials` | Displayed name + favicon/title initials |
-| `roleES` / `roleEN` | Landing subtitle (bilingual) |
-| `anchorES` / `anchorEN` | Quantitative chip under the name (empty = hidden) |
-| `email` / `linkedin` / `featured` | Contact and button links |
-| `siteUrl` | QR + sharing |
-| `vcardTitle` | Job title saved into the vCard |
-| `chatGreetES` / `chatGreetEN` | Mini-chat greeting |
-| `fileBase` | PDF file name on download (`<fileBase>-ES.pdf`) |
-
----
-
-## 7. 🚀 Deployment
-
-Cloudflare Pages + GitHub, native CI/CD: every `git push` to `main` redeploys on its own.
-
-**1. Push the repo (once):**
-
-```bash
-git init && git add . && git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR-USER/portfolio.git
-git push -u origin main
-```
-
-**2. Connect Cloudflare Pages:** Dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** → pick the repo. Build config: **Framework preset** `None`, **Build command** *(empty)*, **Output** `/` → **Save and Deploy**.
-
-**3. Custom domain:** Pages → your project → **Custom domains** → add `your-domain.com`. Cloudflare sets up DNS + HTTPS automatically.
-
-**Workflow:** edit → `git add . && git commit -m "update: ..." && git push` → redeploy in ~1 min.
-
----
-
-## 8. 📊 Analytics (optional)
-
-- **Visits:** Cloudflare Dashboard → your project → **Web Analytics** → enable. Zero code, no cookies.
-- **Per-button click tracking:** already wired in `index.html` (`data-track` elements); logs to console by default. To send it to a service, follow the commented instructions in the `<script>`.
-
----
-
-## 9. 🔎 SEO and indexing
-
-The site is **public and indexable** — meant to be promoted and show up in search engines.
-
-- **`robots.txt`**: `Allow: /` + sitemap pointer. The only block is `Disallow: /cv/`: the PDFs shouldn't appear as standalone results in Google; the entry point is the page.
-- **`sitemap.xml`** (root): lists the two indexable pages —landing (`/`) and CV (`/CV-interactivo.html`)— with `<lastmod>`. Add new pages here.
-- **Canonical:** each HTML declares its canonical URL with `<link rel="canonical">`, to avoid duplicate content.
-- **`_headers`** only carries security headers (no `X-Robots-Tag`).
-
-> The template ships **indexable** by default. To keep it out of search engines (e.g. while you build it), set `Disallow: /` in `robots.txt` and/or add `<meta name="robots" content="noindex">` to each HTML `<head>`.
-
----
-
-## 10. 📌 Notes
-
-- The site is **public and indexable** (see [🔎 SEO and indexing](#9--seo-and-indexing)). This doesn't make it more or less private: the content was always accessible with the link. For real privacy: Cloudflare Access (free up to 50 users).
-- 100% static: no backend, database, or secrets. Don't commit credentials to the repo.
-
----
-
-## 11. 🤖 AI editing guide
-
-Internal tooling documentation, kept in **Spanish only**. See [🤖 Guía para una IA](#11--guía-para-una-ia).
-
----
-
-## 12. 📄 License
-
-Under the **MIT** license — see the [LICENSE](LICENSE) file.
