@@ -4,15 +4,15 @@
 <script>/* one-time reset of legacy auto-saved prefs (old code persisted theme/lang on every load) so device detection works again */try{if(localStorage.getItem('prefv')!=='2'){localStorage.removeItem('theme');localStorage.removeItem('lang');localStorage.setItem('prefv','2');}}catch(e){}/* theme: saved choice first, else the device (OS) preference */try{var t=localStorage.getItem('theme');if(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark');else if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- TEMPLATE: el título y el favicon son estáticos. El contenido del CV sale del objeto DATA (más abajo) y la identidad de config.js. -->
-<title>AD | Curriculum</title>
-<!-- Favicon "AD" — archivos reales (bookmarks, home screen, etc.) -->
+<!-- El título y el favicon son estáticos. El contenido del CV sale del objeto DATA (más abajo) y la identidad de config.js. -->
+<title>PM | Curriculum</title>
+<!-- Favicon "PM" — archivos reales (bookmarks, home screen, etc.) -->
 <link rel="icon" href="icons/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="canonical" href="https://tu-dominio.com/CV-interactivo.html">
+<link rel="canonical" href="https://portfolio-kit-nine.vercel.app/CV-interactivo.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
