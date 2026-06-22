@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 Disallow: /cv/
-Sitemap: https://tu-dominio.com/sitemap.xml
+Sitemap: https://portfolio-pablomazzeo.pages.dev/sitemap.xml

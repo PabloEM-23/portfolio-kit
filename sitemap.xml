@@ -2,11 +2,11 @@
 <!-- Reemplazá "tu-dominio.com" por tu dominio real y actualizá <lastmod>. / Replace "tu-dominio.com" with your real domain and update <lastmod>. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://tu-dominio.com/</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://portfolio-pablomazzeo.pages.dev/</loc>
+    <lastmod>2026-06-21</lastmod>
   </url>
   <url>
-    <loc>https://tu-dominio.com/CV-interactivo.html</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://portfolio-pablomazzeo.pages.dev/CV-interactivo.html</loc>
+    <lastmod>2026-06-21</lastmod>
   </url>
 </urlset>

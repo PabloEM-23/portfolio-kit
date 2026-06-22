@@ -7,26 +7,26 @@
 <!-- TEMPLATE: lo de abajo (título, Open Graph, favicon) es estático — los crawlers de previews no ejecutan JS.
      El resto del contenido sale de config.js. Si cambiás tu nombre ahí, actualizá también estos valores. -->
 <!-- Titulo discreto: solo iniciales -->
-<title>AD | Portfolio</title>
-<link rel="canonical" href="https://tu-dominio.com">
+<title>PM | Portfolio</title>
+<link rel="canonical" href="https://portfolio-pablomazzeo.pages.dev">
 <!-- Open Graph / preview al compartir el link -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="Alex Doe · Portfolio">
-<meta property="og:description" content="Toda mi información profesional en un solo lugar · Full Stack Developer">
-<meta property="og:url" content="https://tu-dominio.com">
-<meta property="og:image" content="https://tu-dominio.com/img/og-photo.jpg">
-<meta property="og:image:secure_url" content="https://tu-dominio.com/img/og-photo.jpg">
+<meta property="og:title" content="Pablo Mazzeo · Portfolio">
+<meta property="og:description" content="Toda mi información profesional en un solo lugar · Database Analyst · Oracle PL/SQL">
+<meta property="og:url" content="https://portfolio-pablomazzeo.pages.dev">
+<meta property="og:image" content="https://portfolio-pablomazzeo.pages.dev/img/og-photo.jpg">
+<meta property="og:image:secure_url" content="https://portfolio-pablomazzeo.pages.dev/img/og-photo.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Alex Doe · Portfolio · Full Stack Developer">
-<meta property="og:locale" content="en_US">
-<meta property="og:locale:alternate" content="es_AR">
+<meta property="og:image:alt" content="Pablo Mazzeo · Portfolio · Database Analyst">
+<meta property="og:locale" content="es_AR">
+<meta property="og:locale:alternate" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Alex Doe · Portfolio">
-<meta name="twitter:description" content="Toda mi información profesional en un solo lugar · Full Stack Developer">
-<meta name="twitter:image" content="https://tu-dominio.com/img/og-photo.jpg">
-<!-- Favicon "AD" — archivos reales (bookmarks, home screen, etc.) -->
+<meta name="twitter:title" content="Pablo Mazzeo · Portfolio">
+<meta name="twitter:description" content="Toda mi información profesional en un solo lugar · Database Analyst · Oracle PL/SQL">
+<meta name="twitter:image" content="https://portfolio-pablomazzeo.pages.dev/img/og-photo.jpg">
+<!-- Favicon "PM" — archivos reales (bookmarks, home screen, etc.) -->
 <link rel="icon" href="icons/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
@@ -226,13 +226,13 @@
     </div>
 
     <div class="hero">
-      <img src="img/photo.jpg" width="800" height="800" fetchpriority="high" alt="Alex Doe">
+      <img src="img/photo.jpg" width="800" height="800" fetchpriority="high" alt="Pablo Mazzeo">
     </div>
 
     <div class="info">
-      <div class="name">Alex Doe</div>
-      <div class="role" id="role" data-es="Desarrollador Full Stack · Producto · Web" data-en="Full Stack Developer · Product · Web">Full Stack Developer · Product · Web</div>
-      <div class="anchor" data-es="+10 años construyendo software" data-en="10+ years building software">10+ years building software</div>
+      <div class="name">Pablo Mazzeo</div>
+      <div class="role" id="role" data-es="Database Analyst · Oracle PL/SQL · SQL" data-en="Database Analyst · Oracle PL/SQL · SQL">Database Analyst · Oracle PL/SQL · SQL</div>
+      <div class="anchor" data-es="+10 años en bases de datos" data-en="10+ years in databases">10+ years in databases</div>
     </div>
 
     <div class="chat">
@@ -474,21 +474,21 @@ var CHAT = {
   es: {
     greet: window.SITE.chatGreetES,
     chips: [
-      { q:"¿A qué te dedicás?", a:"Soy desarrollador full stack: construyo productos web de punta a punta, del backend a la interfaz. Me importa el código mantenible y pensar en el producto, no solo en la feature." },
-      { q:"¿Qué stack usás?", a:"JavaScript/TypeScript en todo el stack: React en el frontend y Node.js en el backend, con Python para automatizaciones y PostgreSQL en datos. Pero el stack es una herramienta, no una religión: elijo el que mejor resuelva el problema." },
-      { q:"¿Cómo trabajás?", a:"En ciclos cortos, con foco en entregar valor seguido: code review, testing automatizado y mejora continua. Me gusta entender el problema del usuario antes de escribir una línea." },
-      { q:"Tu proyecto más importante", a:"Llevar una plataforma SaaS de un MVP a miles de usuarios: rediseñé la API, mejoré la performance y armé el pipeline de CI/CD. Aprendí que escalar es tanto de arquitectura como de proceso." },
-      { q:"¿Qué te apasiona?", a:"Construir cosas que la gente usa. Me prende resolver problemas reales, aprender tecnología nueva y dejar el código mejor de como lo encontré." }
+      { q:"¿A qué te dedicás?", a:"Soy analista de base de datos con foco en Oracle y PL/SQL. Trabajo en el diseño, mantenimiento y optimización de bases de datos en sistemas de telecomunicaciones de alta disponibilidad." },
+      { q:"¿Qué stack usás?", a:"Oracle 10g/11g y PL/SQL como base, SQL para análisis y reporting, Java para automatizaciones puntuales. Trabajo en sistemas BSS/OSS en entornos de producción críticos donde la consistencia de los datos no es negociable." },
+      { q:"¿Cómo trabajás?", a:"Con rigor en cada cambio que toca producción: análisis de impacto, testing en ambientes previos y documentación de rollback. En bases de datos el error tiene un costo alto — prefiero hacer las cosas despacio y bien." },
+      { q:"Tu proyecto más relevante", a:"Soporte y análisis de base de datos de un sistema con millones de usuarios activos. Aprendí que la performance de las queries es tan importante como la disponibilidad del sistema, y que ningún cambio es 'pequeño' en producción." },
+      { q:"¿Qué te apasiona?", a:"La integridad y confiabilidad de los datos. Me apasiona resolver problemas de performance, entender cómo escala una base de datos bajo carga real y mantener la consistencia en sistemas críticos." }
     ]
   },
   en: {
     greet: window.SITE.chatGreetEN,
     chips: [
-      { q:"What do you do?", a:"I'm a full stack developer: I build web products end to end, from the backend to the interface. I care about maintainable code and thinking about the product, not just the feature." },
-      { q:"What's your stack?", a:"JavaScript/TypeScript across the stack: React on the frontend and Node.js on the backend, with Python for automation and PostgreSQL for data. But the stack is a tool, not a religion: I pick whatever best solves the problem." },
-      { q:"How you work", a:"In short cycles, focused on shipping value often: code review, automated testing and continuous improvement. I like to understand the user's problem before writing a line." },
-      { q:"Your most important project", a:"Taking a SaaS platform from an MVP to thousands of users: I redesigned the API, improved performance and set up the CI/CD pipeline. I learned that scaling is as much about process as architecture." },
-      { q:"What are you passionate about?", a:"Building things people use. I get fired up solving real problems, learning new tech, and leaving the code better than I found it." }
+      { q:"What do you do?", a:"I'm a database analyst focused on Oracle and PL/SQL. I specialize in designing, maintaining, and optimizing databases for high-availability telecom systems." },
+      { q:"What's your stack?", a:"Oracle 10g/11g and PL/SQL at the core, SQL for analysis and reporting, Java for targeted automation. I work with BSS/OSS systems in critical production environments where data consistency is non-negotiable." },
+      { q:"How you work", a:"With rigor on every production change: impact analysis, testing in pre-production environments, and rollback documentation. In databases, errors have a high cost — I prefer doing things slowly and correctly." },
+      { q:"Your most relevant project", a:"Database support and analysis for a system with millions of active users. I learned that query performance is just as important as system availability, and that no change is 'small' in production." },
+      { q:"What are you passionate about?", a:"Data integrity and reliability. I'm passionate about solving performance problems, understanding how databases scale under real load, and maintaining consistency in critical systems." }
     ]
   }
 };

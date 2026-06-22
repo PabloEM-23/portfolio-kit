@@ -21,3 +21,6 @@ node_modules/
 
 # PDFs generados localmente desde el HTML (no publicar)
 CV-*.pdf
+
+# Backups del formatter hook (Claude Code)
+*.backup.*
