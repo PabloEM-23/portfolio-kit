@@ -10,12 +10,12 @@ window.SITE = {
   initials: "PM", // se usa en el favicon/título
 
   // --- Rol (subtítulo del landing), bilingüe ---
-  roleES: "Database Analyst · Oracle PL/SQL · SQL",
-  roleEN: "Database Analyst · Oracle PL/SQL · SQL",
+  roleES: "Senior Oracle PL/SQL Developer · Database Engineer",
+  roleEN: "Senior Oracle PL/SQL Developer · Database Engineer",
 
   // --- "Ancla" cuantitativa bajo el nombre, bilingüe (dejá "" para ocultarla) ---
-  anchorES: "+10 años en bases de datos",
-  anchorEN: "10+ years in databases",
+  anchorES: "+15 años de experiencia",
+  anchorEN: "15+ years of experience",
 
   // --- Contacto y links ---
   email: "pablo23.1990@gmail.com",
@@ -24,7 +24,7 @@ window.SITE = {
   siteUrl: "https://portfolio-pablomazzeo.pages.dev", // ⚠️ actualizá con tu dominio real
 
   // --- vCard (lo que se guarda en los contactos) ---
-  vcardTitle: "Database Analyst", // tu puesto
+  vcardTitle: "Senior Oracle PL/SQL Developer", // tu puesto
 
   // --- Saludo del mini-chat, bilingüe ---
   chatGreetES: "¡Hola! Soy Pablo 👋 ¿Qué querés saber sobre mi perfil?",
